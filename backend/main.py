@@ -4,6 +4,7 @@ from google.cloud import texttospeech
 import base64
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import os
 
 # Create a FastAPI instance
 app = FastAPI()
@@ -27,7 +28,9 @@ tts_voice_name = "en-US-Standard-I"
 
 
 # Initialize the client at the top of the file
-client = texttospeech.TextToSpeechClient.from_service_account_json("/Users/sami/projects/FrameCatalyst/secrets/framecatalyst-d4ad79d229a8.json")
+client = texttospeech.TextToSpeechClient.from_service_account_json(
+    os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+)
 
 class TextRequest(BaseModel):
     text: str
