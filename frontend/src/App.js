@@ -9,8 +9,8 @@ function App() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/tts', 
-        JSON.stringify({ text }), 
+      const response = await axios.post('http://localhost:8000/tts',  // Correct endpoint
+        { text },  // Send as regular JSON object, not stringified
         {
           headers: {
             'Content-Type': 'application/json',
