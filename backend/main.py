@@ -2,9 +2,20 @@ from fastapi import FastAPI
 from fastapi import Body
 from google.cloud import texttospeech
 import base64
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 # Create a FastAPI instance
 app = FastAPI()
+
+# Add CORS middleware to allow cross-origin requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Changed from 3001 to 3000
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Define a root endpoint
 @app.get("/")
@@ -18,16 +29,19 @@ tts_voice_name = "en-US-Standard-I"
 # Initialize the client at the top of the file
 client = texttospeech.TextToSpeechClient.from_service_account_json("/Users/sami/projects/FrameCatalyst/secrets/framecatalyst-d4ad79d229a8.json")
 
+class TextRequest(BaseModel):
+    text: str
+
 # Define a TTS endpoint
 @app.post("/tts")
-def generate_tts(text: str = Body(...)):
+def generate_tts(request: TextRequest):
     try:
         # Validate input length
-        if len(text) > 500:
+        if len(request.text) > 500:
             return {"error": "Text too long. Please limit to 500 characters."}
         
         # Prepare TTS request
-        synthesis_input = texttospeech.SynthesisInput(text=text)
+        synthesis_input = texttospeech.SynthesisInput(text=request.text)
         voice = texttospeech.VoiceSelectionParams(
             language_code="en-US",
             ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL,
